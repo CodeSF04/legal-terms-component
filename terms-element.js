@@ -37,15 +37,19 @@ class MergeTerms extends HTMLElement {
 
   actualizarFavicon() {
     try {
-      let link = document.querySelector("link[rel*='icon']");
-      if (!link) {
-        link = document.createElement("link");
-        link.rel = "icon";
-        document.head.appendChild(link);
-      }
+      // Remover favicons previos para forzar cambio inmediato
+      document.querySelectorAll("link[rel*='icon']").forEach(el => el.remove());
+      
+      const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const strokeColor = isDark ? '%23ffffff' : '%23000000';
+      const fillColor = isDark ? '%23ffffff' : '%23000000';
+      
+      const link = document.createElement("link");
+      link.rel = "icon";
       link.type = "image/svg+xml";
-      // Icono neutro monocromático (Blanco / Negro) con soporte dinámico para tema oscuro del sistema
-      link.href = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111827' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><style>@media (prefers-color-scheme: dark) { path, polyline, line { stroke: %23f3f4f6; } }</style><path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/><polyline points='14 2 14 8 20 8'/><line x1='16' y1='13' x2='8' y2='13'/><line x1='16' y1='17' x2='8' y2='17'/><polyline points='10 9 9 9 8 9'/></svg>";
+      // Icono de documento monocromático puro, nítido y de alto contraste
+      link.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='${strokeColor}' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3Cline x1='10' y1='9' x2='8' y2='9'/%3E%3C/svg%3E`;
+      document.head.appendChild(link);
     } catch(e) {}
   }
 
