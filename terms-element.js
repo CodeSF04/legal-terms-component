@@ -708,6 +708,17 @@ class MergeTerms extends HTMLElement {
       </div>
 
       <div class="container">
+        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+          <div style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 14px; background: ${isDark ? 'rgba(42, 92, 255, 0.15)' : '#eff6ff'}; color: ${isDark ? '#60a5fa' : '#2a5cff'}; border: 1px solid ${isDark ? 'rgba(96, 165, 250, 0.25)' : 'rgba(42, 92, 255, 0.15)'};">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+        </div>
         <h1>${termsData[this.idiomaActivo]?.content.title || termsData["en"].content.title}</h1>
         <p class="meta">${termsData[this.idiomaActivo]?.lastUpdatedText || termsData["en"].lastUpdatedText}: ${termsData[this.idiomaActivo]?.lastUpdated || termsData["en"].lastUpdated}</p>
         ${(termsData[this.idiomaActivo]?.content.sections || termsData["en"].content.sections).map(sec => `
