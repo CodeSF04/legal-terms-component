@@ -44,7 +44,8 @@ class MergeTerms extends HTMLElement {
         document.head.appendChild(link);
       }
       link.type = "image/svg+xml";
-      link.href = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23eff6ff' stroke='%232a5cff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/><polyline points='14 2 14 8 20 8' fill='%23dbeafe'/><line x1='16' y1='13' x2='8' y2='13'/><line x1='16' y1='17' x2='8' y2='17'/><polyline points='10 9 9 9 8 9'/></svg>";
+      // Icono neutro monocromático (Blanco / Negro) con soporte dinámico para tema oscuro del sistema
+      link.href = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111827' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><style>@media (prefers-color-scheme: dark) { path, polyline, line { stroke: %23f3f4f6; } }</style><path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/><polyline points='14 2 14 8 20 8'/><line x1='16' y1='13' x2='8' y2='13'/><line x1='16' y1='17' x2='8' y2='17'/><polyline points='10 9 9 9 8 9'/></svg>";
     } catch(e) {}
   }
 
@@ -724,8 +725,8 @@ class MergeTerms extends HTMLElement {
 
       <div class="container">
         <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-          <div style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 14px; background: ${isDark ? 'rgba(42, 92, 255, 0.15)' : '#eff6ff'}; color: ${isDark ? '#60a5fa' : '#2a5cff'}; border: 1px solid ${isDark ? 'rgba(96, 165, 250, 0.25)' : 'rgba(42, 92, 255, 0.15)'};">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <div style="display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 14px; background: ${isDark ? '#1e293b' : '#f8fafc'}; color: ${isDark ? '#f8fafc' : '#0f172a'}; border: 1px solid ${isDark ? '#334155' : '#e2e8f0'}; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
               <line x1="16" y1="13" x2="8" y2="13"></line>
