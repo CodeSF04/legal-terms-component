@@ -77,6 +77,7 @@ class MergeTerms extends HTMLElement {
     this.idiomaActivo = window.location.pathname.split('/')[1] || "en";
     this.idiomasGuardados = ["en"];
     this.soundAlertTimer = null;
+    this.soundBlockedAlertVisible = false;
   }
 
   connectedCallback() {
@@ -258,6 +259,7 @@ class MergeTerms extends HTMLElement {
   }
 
   showSoundBlockedAlert() {
+    this.soundBlockedAlertVisible = true;
     const toast = this.shadowRoot.getElementById('sound-toast');
     if (!toast) return;
     if (this.soundAlertTimer) {
@@ -268,12 +270,10 @@ class MergeTerms extends HTMLElement {
     // Force DOM reflow to restart CSS entry animation
     void toast.offsetWidth;
     toast.style.display = 'flex';
-    this.soundAlertTimer = setTimeout(() => {
-      this.hideSoundBlockedAlert();
-    }, 8000);
   }
 
   hideSoundBlockedAlert() {
+    this.soundBlockedAlertVisible = false;
     if (this.soundAlertTimer) {
       clearTimeout(this.soundAlertTimer);
       this.soundAlertTimer = null;
@@ -736,7 +736,7 @@ class MergeTerms extends HTMLElement {
         `).join('')}
       </div>
 
-      <div class="sound-toast" id="sound-toast">
+      <div class="sound-toast" id="sound-toast" style="display: ${this.soundBlockedAlertVisible ? 'flex' : 'none'};">
         <div class="sound-toast-content">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF9500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           <span id="sound-toast-text">${SOUND_BLOCKED_MESSAGES[this.idiomaActivo] || SOUND_BLOCKED_MESSAGES["en"]}</span>
