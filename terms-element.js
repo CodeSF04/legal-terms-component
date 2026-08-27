@@ -15,28 +15,21 @@ const BCP47_LANGS = {
 };
 
 const SOUND_BLOCKED_MESSAGES = {
-  es: "El sonido está bloqueado en los ajustes de tu navegador. Toca el icono de candado/ajustes junto a la barra de direcciones y activa 'Sonido' para escuchar la lectura.",
-  en: "Sound is blocked in your browser settings. Tap the lock/settings icon next to the address bar and allow 'Sound' to listen.",
-  pt: "O som está bloqueado nas configurações do seu navegador. Toque no cadeado/configurações na barra de endereços e ative 'Som'.",
-  fr: "Le son est bloqué dans les paramètres de votre navigateur. Appuyez sur le cadenas dans la barre d'adresse et activez 'Son'.",
-  de: "Der Ton ist in Ihren Browsereinstellungen blockiert. Tippen Sie auf das Schloss-Symbol in der Adressleiste und aktivieren Sie 'Ton'.",
-  it: "L'audio è bloccato nelle impostazioni del browser. Tocca il lucchetto nella barra degli indirizzi e attiva 'Audio'.",
-  nl: "Geluid is geblokkeerd in uw browserinstellingen. Tik op het slotpictogram in de adresbalk en schakel 'Geluid' in.",
-  ru: "Звук заблокирован в настройках браузера. Нажмите на значок замка в адресной строке и включите «Звук».",
-  tr: "Tarayıcı ayarlarınızda ses engellendi. Adres çubuğundaki kilit simgesine dokunun ve 'Ses' seçeneğine izin verin.",
-  zh: "浏览器设置已阻止声音。请点按地址栏旁边的挂锁/设置图标并允许“声音”。",
-  ja: "ブラウザ設定で音声がブロックされています。アドレスバーの鍵アイコンをタップして「音声」を許可してください。",
-  ko: "브라우저 설정에서 소리가 차단되었습니다. 주소창 옆의 자물쇠/설정 아이콘을 누르고 '소리'를 허용해주세요.",
-  hi: "आपके ब्राउज़र सेटिंग्स में ध्वनि अवरोधित है। एड्रेस बार में लॉक आइकन पर टैप करें और 'ध्वनि' की अनुमति दें।",
-  ar: "تم حظر الصوت في إعدادات متصفحك. انقر فوق رمز القفل في شريط العناvindos واسمح بـ 'الصوت'.",
-  vi: "Âm thanh bị chặn trong cài đặt trình duyệt. Chạm vào biểu tượng ổ khóa trên thanh địa chỉ và cho phép 'Âm thanh'.",
-  id: "Suara diblokir di pengaturan browser Anda. Ketuk ikon gembok di bilah alamat dan izinkan 'Suara'."
+  en: "Sound blocked. Please check site settings to allow sound.",
+  es: "Sonido bloqueado. Revisa la configuración del sitio para permitir sonido.",
+  pt: "Som bloqueado. Verifique as configurações do site.",
+  fr: "Son bloqué. Veuillez vérifier les paramètres du site.",
+  de: "Ton blockiert. Bitte überprüfen Sie die Website-Einstellungen.",
+  it: "Audio bloccato. Controlla le impostazioni del sito."
 };
+
 
 class MergeTerms extends HTMLElement {
 
   actualizarFavicon() {
-    try {
+
+
+        try {
       // Remover favicons previos para forzar cambio inmediato
       document.querySelectorAll("link[rel*='icon']").forEach(el => el.remove());
       
@@ -76,8 +69,9 @@ class MergeTerms extends HTMLElement {
 
     this.idiomaActivo = window.location.pathname.split('/')[1] || "en";
     this.idiomasGuardados = ["en"];
-    this.soundAlertTimer = null;
     this.soundBlockedAlertVisible = false;
+    
+    
   }
 
   connectedCallback() {
@@ -87,7 +81,7 @@ class MergeTerms extends HTMLElement {
 
     const savedLangs = localStorage.getItem('colorscope_langs');
     if (savedLangs) {
-      try {
+          try {
         this.idiomasGuardados = JSON.parse(savedLangs);
       } catch(e) {}
     }
@@ -99,6 +93,9 @@ class MergeTerms extends HTMLElement {
       }
     }
 
+    if (typeof window !== "undefined" && sessionStorage.getItem('soundBlocked') === 'true') {
+      this.soundBlockedAlertVisible = true;
+    }
     this.render();
     document.addEventListener('keydown', this.handleKeydown);
     window.addEventListener('popstate', this.handlePopState);
@@ -106,10 +103,11 @@ class MergeTerms extends HTMLElement {
 
   disconnectedCallback() {
     this.stopKeepAlive();
+    if (this.soundTimeoutCheck) clearTimeout(this.soundTimeoutCheck);
     document.removeEventListener('keydown', this.handleKeydown);
     window.removeEventListener('popstate', this.handlePopState);
     if (typeof window !== "undefined" && 'speechSynthesis' in window) {
-      try {
+          try {
         window.speechSynthesis.cancel();
       } catch(e) {}
     }
@@ -121,7 +119,9 @@ class MergeTerms extends HTMLElement {
 
   cargarVoces() {
     if (typeof window === "undefined" || !('speechSynthesis' in window)) return;
-    try {
+
+
+        try {
       const v = window.speechSynthesis.getVoices();
       if (v && v.length > 0) {
         this.vocesDisponibles = v;
@@ -138,7 +138,7 @@ class MergeTerms extends HTMLElement {
     if (this.pilaCapas.length > 0) {
       const capa = this.pilaCapas.pop();
       if (capa && typeof capa.cerrar === 'function') {
-        try {
+      try {
           capa.cerrar();
         } catch (err) {
           console.error(err);
@@ -229,13 +229,48 @@ class MergeTerms extends HTMLElement {
     }
   }
 
+    showSoundBlockedAlert() {
+    this.soundBlockedAlertVisible = true;
+    sessionStorage.setItem('soundBlocked', 'true');
+    const toast = this.shadowRoot.getElementById('sound-toast');
+    if (!toast) return;
+    
+    if (this._hideToastTimer) {
+      clearTimeout(this._hideToastTimer);
+      this._hideToastTimer = null;
+    }
+    
+    toast.style.display = 'flex';
+    // Force DOM reflow
+    void toast.offsetWidth;
+    toast.classList.add('visible');
+  }
+
+  hideSoundBlockedAlert() {
+    this.soundBlockedAlertVisible = false;
+    sessionStorage.removeItem('soundBlocked');
+    const toast = this.shadowRoot.getElementById('sound-toast');
+    if (!toast) return;
+    
+    if (this._hideToastTimer) {
+      clearTimeout(this._hideToastTimer);
+    }
+    
+    toast.classList.remove('visible');
+    this._hideToastTimer = setTimeout(() => {
+      toast.style.display = 'none';
+    }, 300);
+  }
+
   toggleAudio() {
+    this.hideSoundBlockedAlert();
+    
     if (typeof window === "undefined" || !('speechSynthesis' in window)) return;
 
     if (this.isReading) {
       this.stopReading(false);
     } else {
-      try {
+          try {
         window.speechSynthesis.resume();
       } catch (e) {}
 
@@ -258,37 +293,15 @@ class MergeTerms extends HTMLElement {
     }
   }
 
-  showSoundBlockedAlert() {
-    this.soundBlockedAlertVisible = true;
-    const toast = this.shadowRoot.getElementById('sound-toast');
-    if (!toast) return;
-    if (this.soundAlertTimer) {
-      clearTimeout(this.soundAlertTimer);
-      this.soundAlertTimer = null;
-    }
-    toast.style.display = 'none';
-    // Force DOM reflow to restart CSS entry animation
-    void toast.offsetWidth;
-    toast.style.display = 'flex';
-  }
+  
 
-  hideSoundBlockedAlert() {
-    this.soundBlockedAlertVisible = false;
-    if (this.soundAlertTimer) {
-      clearTimeout(this.soundAlertTimer);
-      this.soundAlertTimer = null;
-    }
-    const toast = this.shadowRoot.getElementById('sound-toast');
-    if (toast) {
-      toast.style.display = 'none';
-    }
-  }
+  
 
   startKeepAlive() {
     this.stopKeepAlive();
     this.keepAliveTimer = setInterval(() => {
       if (typeof window !== "undefined" && 'speechSynthesis' in window && this.isReading && !this.isPaused && window.speechSynthesis.speaking) {
-        try {
+      try {
           window.speechSynthesis.pause();
           window.speechSynthesis.resume();
         } catch(e) {}
@@ -311,10 +324,7 @@ class MergeTerms extends HTMLElement {
       return;
     }
 
-    if (this.soundTimeoutCheck) {
-      clearTimeout(this.soundTimeoutCheck);
-      this.soundTimeoutCheck = null;
-    }
+    
 
     this.isManualCancel = false;
     this.isPaused = false;
@@ -365,14 +375,10 @@ class MergeTerms extends HTMLElement {
 
     msg.onstart = () => {
       speechStarted = true;
-      if (this.soundTimeoutCheck) {
-        clearTimeout(this.soundTimeoutCheck);
-        this.soundTimeoutCheck = null;
-      }
-      this.hideSoundBlockedAlert();
+      
       this.clearReadingHighlights();
       el.classList.add('reading');
-      try {
+          try {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } catch (e) {
         el.scrollIntoView();
@@ -382,32 +388,29 @@ class MergeTerms extends HTMLElement {
     
     msg.onend = () => {
       this.stopKeepAlive();
-      if (this.soundTimeoutCheck) {
-        clearTimeout(this.soundTimeoutCheck);
-        this.soundTimeoutCheck = null;
-      }
+      
       if (this.currentUtterance === msg) {
         this.currentUtterance = null;
         window._colorscopeUtterance = null;
       }
       const elapsed = Date.now() - startTime;
       if (this.isReading && this.currentReadingIndex === index && !this.isManualCancel) {
-        if (speechStarted || elapsed > 350) {
+        // En móviles, si está bloqueado puede disparar onstart y luego onend inmediatamente (ej. 10ms).
+        // Así que exigimos un mínimo de tiempo (ej. 200ms) para considerarlo un éxito.
+        if (elapsed > 200) {
           this.startReading(index + 1);
         } else {
-          // If aborted without starting, the browser blocked sound
+          // If aborted without really speaking, the browser blocked sound
           this.stopReading(false);
           this.showSoundBlockedAlert();
+          
         }
       }
     };
 
     msg.onerror = (e) => {
       this.stopKeepAlive();
-      if (this.soundTimeoutCheck) {
-        clearTimeout(this.soundTimeoutCheck);
-        this.soundTimeoutCheck = null;
-      }
+      
       if (this.currentUtterance === msg) {
         this.currentUtterance = null;
         window._colorscopeUtterance = null;
@@ -416,10 +419,17 @@ class MergeTerms extends HTMLElement {
         console.warn("TTS error on element:", e.error);
         this.stopReading(false);
         this.showSoundBlockedAlert();
+        
       }
     };
 
-    // Fallback: If browser completely ignores speak() without emitting onstart or onerror (sound blocked globally)
+    
+
+
+
+    
+
+      if (this.soundTimeoutCheck) clearTimeout(this.soundTimeoutCheck);
     this.soundTimeoutCheck = setTimeout(() => {
       if (!speechStarted && this.isReading && this.currentReadingIndex === index) {
         this.stopReading(false);
@@ -427,25 +437,23 @@ class MergeTerms extends HTMLElement {
       }
     }, 600);
 
-    try {
+      try {
       window.speechSynthesis.resume();
       window.speechSynthesis.speak(msg);
     } catch(e) {
       console.warn("speechSynthesis speak error:", e);
       this.stopReading(false);
       this.showSoundBlockedAlert();
+      
     }
   }
 
   stopReading(desdeHistorial = false) {
-    if (this.soundTimeoutCheck) {
-      clearTimeout(this.soundTimeoutCheck);
-      this.soundTimeoutCheck = null;
-    }
+    
     this.stopKeepAlive();
     this.isManualCancel = true;
     if (typeof window !== "undefined" && 'speechSynthesis' in window) {
-      try {
+          try {
         window.speechSynthesis.cancel();
       } catch(e) {}
     }
@@ -465,7 +473,7 @@ class MergeTerms extends HTMLElement {
     if (typeof window === "undefined" || !('speechSynthesis' in window)) return;
 
     if (this.isPaused) {
-      try {
+          try {
         window.speechSynthesis.resume();
       } catch (e) {}
       this.isPaused = false;
@@ -473,7 +481,7 @@ class MergeTerms extends HTMLElement {
       this.updatePlayerUI();
     } else {
       this.stopKeepAlive();
-      try {
+          try {
         window.speechSynthesis.pause();
       } catch (e) {}
       this.isPaused = true;
@@ -484,7 +492,7 @@ class MergeTerms extends HTMLElement {
   nextReading() {
     if (this.currentReadingIndex < this.readingElements.length - 1) {
       this.isManualCancel = true;
-      try { window.speechSynthesis.cancel(); } catch(e) {}
+          try { window.speechSynthesis.cancel(); } catch(e) {}
       this.isManualCancel = false;
       this.startReading(this.currentReadingIndex + 1);
     }
@@ -492,7 +500,9 @@ class MergeTerms extends HTMLElement {
 
   prevReading() {
     this.isManualCancel = true;
-    try { window.speechSynthesis.cancel(); } catch(e) {}
+
+
+        try { window.speechSynthesis.cancel(); } catch(e) {}
     this.isManualCancel = false;
     if (this.currentReadingIndex > 0) {
       this.startReading(this.currentReadingIndex - 1);
@@ -642,12 +652,18 @@ class MergeTerms extends HTMLElement {
         .tts-btn:hover { background: ${hoverColor}; }
         .tts-btn.danger:hover { color: ${dangerColor}; background: rgba(255, 59, 48, 0.1); }
 
-        /* TOAST DE AVISO DE SONIDO BLOQUEADO */
-        .sound-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 1000; width: calc(100% - 32px); max-width: 500px; background: ${menuBg}; color: ${textColor}; border: 1px solid ${borderColor}; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 12px 16px; display: none; align-items: center; justify-content: space-between; gap: 12px; font-size: 13.5px; line-height: 1.4; animation: slideToast 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-sizing: border-box; }
-        @keyframes slideToast { from { opacity: 0; transform: translate(-50%, 15px); } to { opacity: 1; transform: translate(-50%, 0); } }
+                /* TOAST DE AVISO DE SONIDO BLOQUEADO */
+        .sound-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 1000; width: calc(100% - 32px); max-width: 400px; background: ${menuBg}; color: ${textColor}; border: 1px solid ${borderColor}; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 12px 16px; display: none; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; line-height: 1.4; opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; box-sizing: border-box; }
+        .sound-toast.visible { display: flex; opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
         .sound-toast-content { display: flex; align-items: center; gap: 12px; text-align: left; }
         .sound-toast-close { background: transparent; border: none; color: ${textColor}; opacity: 0.6; cursor: pointer; padding: 6px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: opacity 0.2s, background 0.2s; touch-action: manipulation; }
         .sound-toast-close:hover { opacity: 1; background: ${hoverColor}; }
+
+        
+        
+        
+        
+        
 
         @media (max-width: 600px) { 
           .container { padding: 120px 20px 40px 20px; } 
@@ -655,7 +671,7 @@ class MergeTerms extends HTMLElement {
           p { font-size: 16px; } 
           .header-bar { top: 12px; left: 12px; right: 12px; }
           .top-btn-row { gap: 8px; }
-          .sound-toast { bottom: 16px; width: calc(100% - 24px); padding: 10px 14px; font-size: 13px; }
+          
         }
       </style>
       
@@ -736,7 +752,9 @@ class MergeTerms extends HTMLElement {
         `).join('')}
       </div>
 
-      <div class="sound-toast" id="sound-toast" style="display: ${this.soundBlockedAlertVisible ? 'flex' : 'none'};">
+      
+
+      <div class="sound-toast ${this.soundBlockedAlertVisible ? 'visible' : ''}" id="sound-toast" style="display: ${this.soundBlockedAlertVisible ? 'flex' : 'none'};">
         <div class="sound-toast-content">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF9500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           <span id="sound-toast-text">${SOUND_BLOCKED_MESSAGES[this.idiomaActivo] || SOUND_BLOCKED_MESSAGES["en"]}</span>
@@ -747,8 +765,9 @@ class MergeTerms extends HTMLElement {
       </div>
     `;
 
-    this.shadowRoot.getElementById('sound-toast-close').onclick = () => this.hideSoundBlockedAlert();
-    this.shadowRoot.getElementById('theme-toggle').onclick = () => this.toggleTheme();
+        this.shadowRoot.getElementById('theme-toggle').onclick = () => this.toggleTheme();
+    const closeBtn = this.shadowRoot.getElementById('sound-toast-close');
+    if (closeBtn) closeBtn.onclick = () => this.hideSoundBlockedAlert();
     this.shadowRoot.getElementById('back-btn').onclick = () => this.goBack();
     this.shadowRoot.getElementById('audio-toggle').onclick = () => this.toggleAudio();
     this.shadowRoot.getElementById('lang-toggle').onclick = (e) => { e.stopPropagation(); this.toggleMenuIdiomas(); };
