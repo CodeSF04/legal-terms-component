@@ -5,7 +5,7 @@ export const termsData = {
     content: {
       title: "TERMS AND CONDITIONS",
       sections: [
-        { title: "1. AGREEMENT TO OUR LEGAL TERMS", body: "We are MergeLabs, a company registered in Argentina. By accessing any of our digital tools, applications, or services, you agree to be bound by these Legal Terms. If you do not agree, you are prohibited from using our Services." },
+        { title: "1. AGREEMENT TO OUR LEGAL TERMS", body: "We are MergeLab, a company registered in Argentina. By accessing any of our digital tools, applications, or services, you agree to be bound by these Legal Terms. If you do not agree, you are prohibited from using our Services." },
         { title: "2. USER REGISTRATION AND ACCOUNTS", body: "You may be required to register an account to access certain Services. You agree to keep your password confidential and are responsible for all activity under your account." },
         { title: "3. SOFTWARE AND CLOUD STORAGE", body: "Our Services include software tools and cloud-based data storage. We provide these 'AS IS.' We are not liable for any data loss, corruption, or downtime. You are responsible for maintaining your own backups of any content you store within our Services." },
         { title: "4. PURCHASES AND PAYMENT", body: "We accept various payment methods via LemonSqueezy, which acts as our merchant of record and payment processor. Subscriptions renew automatically unless canceled." },
