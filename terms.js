@@ -25,7 +25,7 @@ export const termsData = {
     content: {
       title: "TÉRMINOS Y CONDICIONES",
       sections: [
-        { title: "1. ACUERDO CON NUESTROS TÉRMINOS LEGALES", body: "Somos MergeLab, una empresa registrada en Argentina. Al acceder a cualquiera de nuestras herramientas digitales, aplicaciones o servicios, usted acepta estar sujeto a estos Términos Legales. Si no está de acuerdo, tiene prohibido usar nuestros Servicios." },
+        { title: "1. ACUERDO CON NUESTROS TÉRMINOS LEGALES", body: "Somos MergeLabs, una empresa registrada en Argentina. Al acceder a cualquiera de nuestras herramientas digitales, aplicaciones o servicios, usted acepta estar sujeto a estos Términos Legales. Si no está de acuerdo, tiene prohibido usar nuestros Servicios." },
         { title: "2. REGISTRO DE USUARIO Y CUENTAS", body: "Es posible que deba registrar una cuenta para acceder a ciertos Servicios. Usted acepta mantener su contraseña confidencial y es responsable de toda la actividad bajo su cuenta." },
         { title: "3. SOFTWARE Y ALMACENAMIENTO EN LA NUBE", body: "Nuestros Servicios incluyen herramientas de software y almacenamiento de datos en la nube. Los proporcionamos 'TAL CUAL'. No somos responsables por pérdida de datos, corrupción o tiempo de inactividad. Usted es responsable de mantener sus propias copias de seguridad." },
         { title: "4. COMPRAS Y PAGOS", body: "Aceptamos varios métodos de pago a través de LemonSqueezy, que actúa como nuestro comerciante registrado y procesador de pagos. Las suscripciones se renuevan automáticamente a menos que se cancelen." },
